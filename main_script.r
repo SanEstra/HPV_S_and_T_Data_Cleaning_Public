@@ -14,6 +14,21 @@ COLUMN_GROUPS <- c("Exist_BC", "Exist_CC", "Method", "Program_Type",
                    "Coverage", "Exist_HPV")
 
 
+# For changing values to "unknown" later.
+
+UNKNOWN_VALUES <- c("Don't know", "No data received", "No response")
+UNKNOWN_RESULT <- "Unknown"
+
+
+# A simple formula that takes a column and renames entries to a specified value
+#   TODO: Get rid of the "unknown" language and make it more general.
+
+change_to_unknown <- function(row, unknown_response, unknown_result) {
+    case_when(row %in% unknown_response ~ unknown_result,
+              TRUE ~ row)
+}
+
+
 
 # There is likely a better way to do this (i.e. purrr), but this works for a
 #   two variable solution for now, and gives the correct ordering.
@@ -48,3 +63,17 @@ data <- map_dfr(YEARS_OF_DATA,
            }) %>%
     arrange(Country, Year)
 
+
+# Gets rid of "don't know", "no data received" and "no response".
+
+data <- data %>%
+    mutate(across(!Year, # Need to remove Year since it is numeric. 
+                  change_to_unknown,
+                  unknown_response = UNKNOWN_VALUES,
+                  unknown_result = UNKNOWN_RESULT)
+           )
+
+
+# See the amounts of factors.
+
+# map(select(data, -Country), table)
