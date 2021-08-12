@@ -1,7 +1,6 @@
 library(here)  # here()
 library(dplyr) # various
 library(readr) # read_csv()
-library(purrr) # mapchr()
 library(tidyr)
 
 
@@ -11,8 +10,9 @@ library(tidyr)
 
 YEARS_OF_DATA <- c(2019, 2017, 2015)
 
-COLUMN_GROUPS <- c("_Exist_BC", "_Exist_CC", "_Method", "Program_Type", 
-                   "_Coverage", "_Exist_HPV")
+COLUMN_GROUPS <- c("Exist_BC", "Exist_CC", "Method", "Program_Type", 
+                   "Coverage", "Exist_HPV")
+
 
 
 # There is likely a better way to do this (i.e. purrr), but this works for a
@@ -25,8 +25,26 @@ grouped_colnames <- expand.grid(YEARS_OF_DATA, COLUMN_GROUPS) %>%
     pull(final_col_name)
 
 
-
 # Load in data.
 
 data <- read_csv(here("data.csv"), skip = 1)
-colnames(data) <- c("Country", grouped_colnames)
+
+# Wide to long with multiple headers
+# First we loop through the years present, selecting for all columns that start
+#   with that year. Rename the columns to what they actually represent, then
+#   stack those datasets on each other.
+
+data <- map_dfr(YEARS_OF_DATA,
+           ~{
+               # Look to see if there is a single pipeline that can be used.
+               tmp_df <- select(data, starts_with(as.character(.x)))
+               colnames(tmp_df) <- COLUMN_GROUPS
+
+               # Add lost data back 
+               tmp_df %>%
+                   mutate(Year = .x,
+                          Country = pull(data, Country)) %>%
+                   relocate(Country, Year)
+           }) %>%
+    arrange(Country, Year)
+
