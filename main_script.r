@@ -75,5 +75,4 @@ data <- data %>%
 
 
 # See the amounts of factors.
-
 # map(select(data, -Country), table)
