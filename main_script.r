@@ -58,11 +58,10 @@ data <- read_csv(here("data.csv"), skip = 1)
 data <- map_dfr(YEARS_OF_DATA,
            ~{
                # Look to see if there is a single pipeline that can be used.
-               tmp_df <- select(data, starts_with(as.character(.x)))
-               colnames(tmp_df) <- COLUMN_GROUPS
+               tmp_df <- select(data, starts_with(as.character(.x))) %>%
+                   rename_with(~{COLUMN_GROUPS}) %>%
 
-               # Add lost data back 
-               tmp_df %>%
+               # Add lost data back
                    mutate(Year = .x,
                           Country = pull(data, Country)) %>%
                    relocate(Country, Year)
