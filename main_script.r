@@ -1,3 +1,8 @@
+# TODO: Country name to ISO code.
+# TODO: Fix comments that correspond to old data wrangling
+# TODO: Make years more dynamic (not strictly necessary)
+# TODO: Figure out what ranges to use for coverage and make them numeric
+
 library(here)  # here()
 library(dplyr) # various
 library(readr) # read_csv()
