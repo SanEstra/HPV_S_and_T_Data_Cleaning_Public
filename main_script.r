@@ -1,7 +1,8 @@
 library(here)  # here()
 library(dplyr) # various
 library(readr) # read_csv()
-library(tidyr) # pull()
+library(tidyr) # pull() 
+library(purrr) # map_dfr()
 
 
 
